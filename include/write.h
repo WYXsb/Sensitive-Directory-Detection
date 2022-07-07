@@ -9,7 +9,6 @@ char filebuf[MAX][512];
 char sepc[MAX];
 FILE *wfile;
 
-
 int myread(char buf[][512],FILE *file);
 void W(char *p, int left, int right); //快速排序,先去重
 int pathfind(char *sepc, char *buf, FILE *file);

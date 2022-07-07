@@ -4,21 +4,22 @@
 #include <sys/types.h>
 #include "../include/write.h"
 #define MAX 9999
-const int ALLLEN = 106;
+const int ALLLEN = 113;
 int PATHLEN = 64;
-const int SHA1LEN = 40;
+const int SHA1LEN = 40; 
 int sum;
 int sumlen;
+const int READLINE = 512;
 /***
  * 从文件file当前光标位置中读取每一行的内容放入数组buf中
- * 每一行内容不超过512个字节
+ * 每一行内容不超过READLINE个字节
  * 返回文件行数
  * ***/
-int myread(char buf[][512],FILE *file)
+int myread(char buf[][READLINE],FILE *file)
 {
     int num = 0;
     int ret;
-    while ((ret = (size_t)fgets(buf[num++], 512, file)) != 0)
+    while ((ret = (size_t)fgets(buf[num++], READLINE, file)) != 0)
         ;
     return num;
 }
@@ -26,8 +27,8 @@ int myread(char buf[][512],FILE *file)
 void W(char *p, int left, int right) //先去重
 {
     //printf("left:%d right:%d\n",left,right);
-    char flag[512];
-    memcpy(flag,p+left*512,512);
+    char flag[READLINE];
+    memcpy(flag,p+left*READLINE,READLINE);
     
     int l = left;
     int t = right;
@@ -35,17 +36,17 @@ void W(char *p, int left, int right) //先去重
     //printf("%s12\n",flag);
     while (left < right)
     {
-        if ( memcmp(flag,p+right*512,512) > 0)
+        if ( memcmp(flag,p+right*READLINE,READLINE) > 0)
         {
-            memcpy(p+left*512,p+right*512,512);
+            memcpy(p+left*READLINE,p+right*READLINE,READLINE);
             //*(p + left) = *(p + right);
             left++;
             while (left < right)
             {
-                if (memcmp(flag,p+left*512,512) < 0)
+                if (memcmp(flag,p+left*READLINE,READLINE) < 0)
                 {
                     //*(p + right) = *(p + left);
-                    memcpy(p+right*512,p+left*512,512);
+                    memcpy(p+right*READLINE,p+left*READLINE,READLINE);
                     right--;
                     break; 
                 }
@@ -67,7 +68,7 @@ void W(char *p, int left, int right) //先去重
     //*(p + left) = flag;
     //printf("left:%d right:%d\n",left,right);
     //strcpy(p[left],flag);
-    memcpy(p+left*512,flag,512);
+    memcpy(p+left*READLINE,flag,READLINE);
     W(p, l, left - 1);
     W(p, right + 1, t);
 
@@ -76,7 +77,7 @@ void W(char *p, int left, int right) //先去重
     排序并将buf中的内容写入wfile文件中
     filesum是wfile文件的第一行
  * */
-int mywrite(char buf[MAX][512],int num,FILE *wfile)
+int mywrite(char buf[MAX][READLINE],int num,FILE *wfile)
 {
     int ret;
     char filenum[64];     //文件中总项数
@@ -118,7 +119,7 @@ int pathfind(char *sepc, char *buf, FILE *file)
         if (memcmp(sepc, buf, PATHLEN) == 0)
         {
             //printf("ok\n");
-            return 1;
+            return mid;
         }
         else if (memcmp(sepc, buf, PATHLEN) > 0)
         {
@@ -146,7 +147,7 @@ int pathfind(char *sepc, char *buf, FILE *file)
         {   
 
             //printf("ok\n");
-            return 1;
+            return i;
         }
     }
     return 0;
